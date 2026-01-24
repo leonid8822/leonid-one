@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Леонид — Иду туда, где ещё никто не был</title>
+    <meta name="description" content="Математик → финтех → материализация идей. Запускаю то, что ещё не существует.">
+    
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg: #FAFAF8;
+            --text: #1a1a1a;
+            --text-muted: #666;
+            --accent: #FF4D00;
+            --accent-soft: #fff0eb;
+            --serif: 'Cormorant Garamond', Georgia, serif;
+            --mono: 'JetBrains Mono', monospace;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ::selection {
+            background: var(--accent);
+            color: white;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: var(--serif);
+            background: var(--bg);
+            color: var(--text);
+            font-size: 18px;
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Cursor trail effect - the "ебанца" */
+        .cursor-dot {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--accent);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 9999;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        body:hover .cursor-dot {
+            opacity: 1;
+        }
+
+        .container {
+            max-width: 720px;
+            margin: 0 auto;
+            padding: 0 24px;
+        }
+
+        /* Hero */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 80px 0;
+            position: relative;
+        }
+
+        .hero::before {
+            content: '01';
+            position: absolute;
+            top: 40px;
+            right: 24px;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        .photo-wrapper {
+            width: 280px;
+            height: 380px;
+            overflow: hidden;
+            margin-bottom: 48px;
+            position: relative;
+            background: #1a1a1a;
+        }
+
+        .photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center top;
+            filter: grayscale(100%);
+            transition: filter 0.5s ease;
+        }
+
+        .photo-wrapper:hover img {
+            filter: grayscale(0%);
+        }
+
+        .hero h1 {
+            font-size: clamp(2.5rem, 8vw, 4rem);
+            font-weight: 400;
+            line-height: 1.1;
+            margin-bottom: 32px;
+            letter-spacing: -0.02em;
+        }
+
+        .hero h1 span {
+            display: inline-block;
+            position: relative;
+        }
+
+        .hero h1 span::after {
+            content: '';
+            position: absolute;
+            bottom: 4px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--accent);
+            transform: scaleX(0);
+            transform-origin: left;
+            animation: underline 1s ease-out 0.5s forwards;
+        }
+
+        @keyframes underline {
+            to { transform: scaleX(1); }
+        }
+
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            max-width: 480px;
+        }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 40px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-family: var(--mono);
+            font-size: 11px;
+            color: var(--text-muted);
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            animation: bounce 2s infinite;
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateX(-50%) translateY(0); }
+            50% { transform: translateX(-50%) translateY(8px); }
+        }
+
+        /* Sections */
+        section {
+            padding: 120px 0;
+            position: relative;
+        }
+
+        section::before {
+            position: absolute;
+            top: 120px;
+            right: 24px;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            letter-spacing: 0.1em;
+        }
+
+        .about::before { content: '02'; }
+        .path::before { content: '03'; }
+        .now::before { content: '04'; }
+        .contact::before { content: '05'; }
+
+        h2 {
+            font-size: 0.75rem;
+            font-family: var(--mono);
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.2em;
+            color: var(--text-muted);
+            margin-bottom: 32px;
+        }
+
+        .about p {
+            font-size: 1.35rem;
+            line-height: 1.8;
+            margin-bottom: 24px;
+        }
+
+        .about p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        /* Path / Experience */
+        .path-grid {
+            display: grid;
+            gap: 48px;
+        }
+
+        .path-item {
+            display: grid;
+            grid-template-columns: 100px 1fr;
+            gap: 24px;
+            align-items: baseline;
+        }
+
+        .path-year {
+            font-family: var(--mono);
+            font-size: 13px;
+            color: var(--text-muted);
+        }
+
+        .path-content h3 {
+            font-size: 1.25rem;
+            font-weight: 400;
+            margin-bottom: 8px;
+        }
+
+        .path-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Now section */
+        .now-content {
+            font-size: 1.35rem;
+            line-height: 1.8;
+        }
+
+        .now-content p {
+            margin-bottom: 24px;
+        }
+
+        .stay-tuned {
+            display: inline-block;
+            margin-top: 32px;
+            padding: 12px 24px;
+            background: var(--accent-soft);
+            border-radius: 100px;
+            font-family: var(--mono);
+            font-size: 13px;
+            letter-spacing: 0.05em;
+            color: var(--accent);
+        }
+
+        /* Contact */
+        .contact-links {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .contact-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 1.1rem;
+            color: var(--text);
+            text-decoration: none;
+            padding: 16px 0;
+            border-bottom: 1px solid #eee;
+            transition: all 0.3s ease;
+        }
+
+        .contact-link:hover {
+            color: var(--accent);
+            padding-left: 16px;
+            border-color: var(--accent);
+        }
+
+        .contact-link-label {
+            font-family: var(--mono);
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            min-width: 100px;
+        }
+
+        .cta-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            margin-top: 48px;
+            padding: 20px 40px;
+            background: var(--text);
+            color: var(--bg);
+            text-decoration: none;
+            font-family: var(--mono);
+            font-size: 13px;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .cta-button:hover {
+            background: var(--accent);
+            transform: translateY(-2px);
+        }
+
+        .cta-button svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Footer */
+        footer {
+            padding: 48px 0;
+            text-align: center;
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
+        }
+
+        /* Responsive */
+        @media (max-width: 640px) {
+            .path-item {
+                grid-template-columns: 1fr;
+                gap: 8px;
+            }
+
+            section::before {
+                display: none;
+            }
+
+            .hero::before {
+                display: none;
+            }
+        }
+
+        /* Fade in animation */
+        .fade-in {
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s ease-out;
+        }
+
+        .fade-in.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+</head>
+<body>
+    <div class="cursor-dot"></div>
+
+    <main class="container">
+        <!-- Hero -->
+        <section class="hero">
+            <div class="photo-wrapper">
+                <img src="photo.jpg" alt="Леонид">
+            </div>
+            
+            <h1>Иду туда, где ещё <span>никто не был</span></h1>
+            
+            <p class="hero-subtitle">
+                Математик → финтех → материализация идей.<br>
+                Запускаю то, что пока не существует.
+            </p>
+
+            <span class="scroll-hint">↓</span>
+        </section>
+
+        <!-- About -->
+        <section class="about fade-in">
+            <h2>Обо мне</h2>
+            
+            <p>Всю жизнь меня тянет туда, где непонятно другим, но «примерно» понятно мне. Туда, где ещё нет дороги, нет инструкции. В школе я не решал задачи, которые мог решить кто-то другой — если решил, значит, несложная и не моя. Я разбирался в тех, которые не могли решить остальные. Это со мной до сих пор.</p>
+            
+            <p>Родился в Нижнем Тагиле. Пацанский, промышленный город — но я и не думал там остаться. Ездил по России на шахматные чемпионаты, потом на олимпиады по математике. В семнадцать переехал в Москву, поступил на мехмат МГУ без экзаменов. В дипломе написано «математик».</p>
+
+            <p>Научился видеть структуры там, где другие видят хаос. Но вопрос всегда был в другом: как абстракцию превратить в материю? Как соединить небо и землю?</p>
+        </section>
+
+        <!-- Path -->
+        <section class="path fade-in">
+            <h2>Путь</h2>
+            
+            <div class="path-grid">
+                <div class="path-item">
+                    <span class="path-year">8 лет</span>
+                    <div class="path-content">
+                        <h3>Тинькофф</h3>
+                        <p>Финтех, запуск продуктов, построение систем с нуля. Оказываюсь там, где потенциал — люди, капитал, идеи — и надо из этого что-то родить</p>
+                    </div>
+                </div>
+                
+                <div class="path-item">
+                    <span class="path-year">Филиппины</span>
+                    <div class="path-content">
+                        <h3>Финтех с нуля</h3>
+                        <p>Запуск банка с командой из Тинька. Автоматизации, которые все считали невозможными</p>
+                    </div>
+                </div>
+                
+                <div class="path-item">
+                    <span class="path-year">2019–</span>
+                    <div class="path-content">
+                        <h3>Zerocoder</h3>
+                        <p>Сооснователь. Правила игры поменялись — любой может запустить продукт сам</p>
+                    </div>
+                </div>
+                
+                <div class="path-item">
+                    <span class="path-year">→</span>
+                    <div class="path-content">
+                        <h3>Content Hero</h3>
+                        <p>Онлайн-образование. Система челленджей для тех, кто хочет начать, но не может подступиться</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Now -->
+        <section class="now fade-in">
+            <h2>Сейчас</h2>
+            
+            <div class="now-content">
+                <p>Устал от чистого неба. От цифр на экране, от продуктов, которые нельзя потрогать. Захотелось земли — не отказаться от абстракций, а соединить их с материей.</p>
+
+                <p>Занимаюсь ювелирным проектом. Превращение мысли в металл и камень. Сделал и подарил штук 40 браслетов из камней — просто потому что нравится процесс творения и дарения. Чувствовать материал, понимать человека и делать то, что имеет смысл и содержит энергию.</p>
+                
+                <span class="stay-tuned">stay tuned — готовлюсь к запуску</span>
+            </div>
+        </section>
+
+        <!-- Contact -->
+        <section class="contact fade-in">
+            <h2>Связаться</h2>
+            
+            <div class="contact-links">
+                <a href="https://t.me/leodusha" target="_blank" class="contact-link">
+                    <span class="contact-link-label">Канал</span>
+                    @leodusha
+                </a>
+                
+                <a href="https://t.me/leonidone" target="_blank" class="contact-link">
+                    <span class="contact-link-label">Написать</span>
+                    @leonidone
+                </a>
+            </div>
+
+            <a href="https://calendly.com/leonidone/45min" target="_blank" class="cta-button">
+                Забронировать звонок
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+            </a>
+        </section>
+    </main>
+
+    <footer>
+        <div class="container">
+            leonid.one · 2026
+        </div>
+    </footer>
+
+    <script>
+        // Cursor trail effect
+        const cursor = document.querySelector('.cursor-dot');
+        let mouseX = 0, mouseY = 0;
+        let cursorX = 0, cursorY = 0;
+
+        document.addEventListener('mousemove', (e) => {
+            mouseX = e.clientX;
+            mouseY = e.clientY;
+        });
+
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.left = cursorX - 4 + 'px';
+            cursor.style.top = cursorY - 4 + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+        animateCursor();
+
+        // Fade in on scroll
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('visible');
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.fade-in').forEach(el => observer.observe(el));
+    </script>
+</body>
+</html>

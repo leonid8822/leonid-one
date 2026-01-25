@@ -417,6 +417,33 @@
             height: 16px;
         }
 
+        /* Tags */
+        .tags {
+            padding: 60px 0;
+        }
+
+        .tags-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .tag {
+            font-family: var(--mono);
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 8px 16px;
+            border: 1px solid #333;
+            border-radius: 100px;
+            transition: all 0.3s ease;
+        }
+
+        .tag:hover {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
         /* Footer */
         footer {
             padding: 48px 0;
@@ -567,6 +594,25 @@
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17 8l4 4m0 0l-4 4m4-4H3" />
                 </svg>
             </a>
+        </section>
+
+        <!-- Tags -->
+        <section class="tags fade-in">
+            <div class="tags-list">
+                <span class="tag">математика</span>
+                <span class="tag">финтех</span>
+                <span class="tag">стартапы</span>
+                <span class="tag">AI</span>
+                <span class="tag">vibe-coding</span>
+                <span class="tag">автоматизации</span>
+                <span class="tag">ювелирка</span>
+                <span class="tag">камни</span>
+                <span class="tag">боевые искусства</span>
+                <span class="tag">шахматы</span>
+                <span class="tag">полёты</span>
+                <span class="tag">отцовство</span>
+                <span class="tag">блог</span>
+            </div>
         </section>
     </main>
 

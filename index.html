@@ -627,10 +627,11 @@ leonid.one © с вами с 1989 года
         const flashlight = document.querySelector('.flashlight');
         const warmGlow = document.querySelector('.warm-glow');
         const cursor = document.querySelector('.cursor-dot');
-        let mouseX = 0, mouseY = 0;
-        let cursorX = 0, cursorY = 0;
-        let lightTimeout;
-        const isMobile = window.matchMedia('(max-width: 768px)').matches;
+        let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+        let cursorX = mouseX, cursorY = mouseY;
+
+        // Check if touch device (more reliable than width)
+        const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
         // Desktop: follow cursor
         document.addEventListener('mousemove', (e) => {
@@ -640,8 +641,17 @@ leonid.one © с вами с 1989 года
             document.documentElement.style.setProperty('--mouse-y', mouseY + 'px');
         });
 
-        // Mobile: fixed glowing dot in center
-        if (isMobile) {
+        // Cursor animation (always runs on non-touch devices)
+        function animateCursor() {
+            cursorX += (mouseX - cursorX) * 0.15;
+            cursorY += (mouseY - cursorY) * 0.15;
+            cursor.style.left = cursorX - 6 + 'px';
+            cursor.style.top = cursorY - 6 + 'px';
+            requestAnimationFrame(animateCursor);
+        }
+
+        if (isTouchDevice) {
+            // Mobile: fixed glowing dot in center
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
 
@@ -651,7 +661,6 @@ leonid.one © с вами с 1989 года
             cursor.style.top = centerY - 6 + 'px';
             cursor.classList.add('mobile-visible');
 
-            // Update on resize/orientation change
             window.addEventListener('resize', () => {
                 const newCenterX = window.innerWidth / 2;
                 const newCenterY = window.innerHeight / 2;
@@ -660,17 +669,10 @@ leonid.one © с вами с 1989 года
                 cursor.style.left = newCenterX - 6 + 'px';
                 cursor.style.top = newCenterY - 6 + 'px';
             });
+        } else {
+            // Desktop: animate cursor
+            animateCursor();
         }
-
-        // Cursor animation (desktop only)
-        function animateCursor() {
-            cursorX += (mouseX - cursorX) * 0.15;
-            cursorY += (mouseY - cursorY) * 0.15;
-            cursor.style.left = cursorX - 6 + 'px';
-            cursor.style.top = cursorY - 6 + 'px';
-            requestAnimationFrame(animateCursor);
-        }
-        if (!isMobile) animateCursor();
 
         // Fade in on scroll
         const observerOptions = {

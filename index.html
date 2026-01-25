@@ -142,21 +142,18 @@
             letter-spacing: 0.1em;
         }
 
-        /* Photo - fixed on right */
+        /* Photo - in hero section */
         .photo-wrapper {
-            position: fixed;
-            right: 5vw;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 280px;
-            height: auto;
-            max-height: 80vh;
-            overflow: hidden;
-            background: transparent;
-            z-index: 1;
+            display: none;
         }
 
-        .photo-wrapper img {
+        .hero-photo {
+            width: 200px;
+            height: auto;
+            flex-shrink: 0;
+        }
+
+        .hero-photo img {
             width: 100%;
             height: auto;
             object-fit: contain;
@@ -164,29 +161,42 @@
             transition: filter 0.5s ease;
         }
 
-        .photo-wrapper:hover img {
+        .hero-photo:hover img {
             filter: grayscale(0%);
         }
 
-        /* Mobile: photo as background */
-        @media (max-width: 900px) {
-            .photo-wrapper {
-                position: fixed;
-                right: 0;
-                top: 0;
-                transform: none;
-                width: 100%;
-                height: 100vh;
-                max-height: none;
-                opacity: 0.12;
+        /* Hero layout */
+        .hero-content {
+            display: flex;
+            align-items: center;
+            gap: 48px;
+        }
+
+        .hero-text {
+            flex: 1;
+        }
+
+        /* Mobile: photo as background behind text */
+        @media (max-width: 768px) {
+            .hero-content {
+                flex-direction: column;
+                position: relative;
+            }
+
+            .hero-photo {
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                width: 80%;
+                max-width: 300px;
+                opacity: 0.15;
                 z-index: 0;
             }
 
-            .photo-wrapper img {
-                width: 100%;
-                height: 100%;
-                object-fit: cover;
-                object-position: center top;
+            .hero-text {
+                position: relative;
+                z-index: 1;
             }
         }
 
@@ -454,21 +464,21 @@
     <div class="warm-glow"></div>
     <div class="cursor-dot"></div>
 
-    <div class="photo-wrapper">
-        <img src="photo.jpg" alt="Леонид Орлов">
-    </div>
-
     <main class="container">
         <!-- Hero -->
         <section class="hero">
-            <p class="hero-name">Леонид Орлов</p>
-            
-            <h1>Техно­предприниматель</h1>
-            
-            <p class="hero-subtitle">
-                Соединяю то, что ещё не соединяли.
-            </p>
-
+            <div class="hero-content">
+                <div class="hero-photo">
+                    <img src="photo.jpg" alt="Леонид Орлов">
+                </div>
+                <div class="hero-text">
+                    <p class="hero-name">Леонид Орлов</p>
+                    <h1>Техно­предприниматель</h1>
+                    <p class="hero-subtitle">
+                        Соединяю то, что ещё не соединяли.
+                    </p>
+                </div>
+            </div>
             <span class="scroll-hint">↓</span>
         </section>
 

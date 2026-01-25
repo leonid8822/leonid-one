@@ -110,20 +110,27 @@
         /* Cursor trail */
         .cursor-trail {
             position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             pointer-events: none;
             z-index: 9998;
         }
 
-        .cursor-trail line {
+        .cursor-trail polyline {
+            fill: none;
             stroke: var(--accent);
-            stroke-width: 1;
+            stroke-width: 1.5;
             stroke-linecap: round;
+            stroke-linejoin: round;
             opacity: 0;
             transition: opacity 0.3s;
         }
 
-        body:hover .cursor-trail line {
-            opacity: 0.6;
+        body:hover .cursor-trail polyline,
+        .cursor-trail.mobile-visible polyline {
+            opacity: 0.5;
         }
 
         /* Mobile: show dot on tap */
@@ -508,8 +515,8 @@
 <body>
     <div class="flashlight"></div>
     <div class="warm-glow"></div>
-    <svg class="cursor-trail" width="100%" height="100%">
-        <line x1="0" y1="0" x2="0" y2="0" />
+    <svg class="cursor-trail">
+        <polyline points="" />
     </svg>
     <div class="cursor-dot"></div>
 
@@ -649,16 +656,25 @@ leonid.one © с вами с 1989 года
         const flashlight = document.querySelector('.flashlight');
         const warmGlow = document.querySelector('.warm-glow');
         const cursor = document.querySelector('.cursor-dot');
-        const trailLine = document.querySelector('.cursor-trail line');
+        const trailSvg = document.querySelector('.cursor-trail');
+        const trailPolyline = document.querySelector('.cursor-trail polyline');
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY;
 
         // Trail history for smooth line
         const trailHistory = [];
-        const trailLength = 20;
+        const trailLength = 25;
 
-        // Check if touch device (more reliable than width)
+        // Check if touch device
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
+        // Update trail polyline from history
+        function updateTrail() {
+            if (trailHistory.length > 1) {
+                const points = trailHistory.map(p => `${p.x},${p.y}`).join(' ');
+                trailPolyline.setAttribute('points', points);
+            }
+        }
 
         // Desktop: follow cursor
         document.addEventListener('mousemove', (e) => {
@@ -675,43 +691,65 @@ leonid.one © с вами с 1989 года
             cursor.style.left = cursorX - 6 + 'px';
             cursor.style.top = cursorY - 6 + 'px';
 
-            // Update trail
+            // Update trail history
             trailHistory.push({ x: cursorX, y: cursorY });
             if (trailHistory.length > trailLength) {
                 trailHistory.shift();
             }
 
-            // Draw line from oldest point to cursor
-            if (trailHistory.length > 1) {
-                const oldest = trailHistory[0];
-                trailLine.setAttribute('x1', oldest.x);
-                trailLine.setAttribute('y1', oldest.y);
-                trailLine.setAttribute('x2', cursorX);
-                trailLine.setAttribute('y2', cursorY);
-            }
-
+            updateTrail();
             requestAnimationFrame(animateCursor);
         }
 
         if (isTouchDevice) {
-            // Mobile: fixed glowing dot in center
+            // Mobile: touch to move light and trail
             const centerX = window.innerWidth / 2;
             const centerY = window.innerHeight / 2;
+            let touchX = centerX, touchY = centerY;
 
             document.documentElement.style.setProperty('--mouse-x', centerX + 'px');
             document.documentElement.style.setProperty('--mouse-y', centerY + 'px');
             cursor.style.left = centerX - 6 + 'px';
             cursor.style.top = centerY - 6 + 'px';
             cursor.classList.add('mobile-visible');
+            trailSvg.classList.add('mobile-visible');
 
-            window.addEventListener('resize', () => {
-                const newCenterX = window.innerWidth / 2;
-                const newCenterY = window.innerHeight / 2;
-                document.documentElement.style.setProperty('--mouse-x', newCenterX + 'px');
-                document.documentElement.style.setProperty('--mouse-y', newCenterY + 'px');
-                cursor.style.left = newCenterX - 6 + 'px';
-                cursor.style.top = newCenterY - 6 + 'px';
+            // Initialize trail at center
+            for (let i = 0; i < trailLength; i++) {
+                trailHistory.push({ x: centerX, y: centerY });
+            }
+
+            function animateMobile() {
+                cursorX += (touchX - cursorX) * 0.15;
+                cursorY += (touchY - cursorY) * 0.15;
+                cursor.style.left = cursorX - 6 + 'px';
+                cursor.style.top = cursorY - 6 + 'px';
+
+                document.documentElement.style.setProperty('--mouse-x', cursorX + 'px');
+                document.documentElement.style.setProperty('--mouse-y', cursorY + 'px');
+
+                trailHistory.push({ x: cursorX, y: cursorY });
+                if (trailHistory.length > trailLength) {
+                    trailHistory.shift();
+                }
+
+                updateTrail();
+                requestAnimationFrame(animateMobile);
+            }
+
+            document.addEventListener('touchstart', (e) => {
+                const touch = e.touches[0];
+                touchX = touch.clientX;
+                touchY = touch.clientY;
             });
+
+            document.addEventListener('touchmove', (e) => {
+                const touch = e.touches[0];
+                touchX = touch.clientX;
+                touchY = touch.clientY;
+            });
+
+            animateMobile();
         } else {
             // Desktop: animate cursor with trail
             animateCursor();

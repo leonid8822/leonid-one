@@ -63,6 +63,28 @@
             transition: opacity 0.5s ease;
         }
 
+        /* Warm glow overlay for text */
+        .warm-glow {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 9997;
+            background: radial-gradient(
+                circle 400px at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
+                rgba(255, 77, 0, 0.08) 0%,
+                transparent 100%
+            );
+            mix-blend-mode: screen;
+            transition: opacity 0.5s ease;
+        }
+
+        .warm-glow.off {
+            opacity: 0;
+        }
+
         .flashlight.off {
             opacity: 0;
         }
@@ -401,6 +423,7 @@
 </head>
 <body>
     <div class="flashlight"></div>
+    <div class="warm-glow"></div>
     <div class="cursor-dot"></div>
 
     <main class="container">
@@ -511,13 +534,14 @@
 
     <footer>
         <div class="container">
-            <span class="footer-accent">с 1989</span>
+leonid.one © с вами с 1989 года
         </div>
     </footer>
 
     <script>
         // Flashlight effect
         const flashlight = document.querySelector('.flashlight');
+        const warmGlow = document.querySelector('.warm-glow');
         const cursor = document.querySelector('.cursor-dot');
         let mouseX = 0, mouseY = 0;
         let cursorX = 0, cursorY = 0;
@@ -535,16 +559,19 @@
         // Mobile: tap to light
         if (isMobile) {
             flashlight.classList.add('off');
+            warmGlow.classList.add('off');
 
             document.addEventListener('touchstart', (e) => {
                 const touch = e.touches[0];
                 document.documentElement.style.setProperty('--mouse-x', touch.clientX + 'px');
                 document.documentElement.style.setProperty('--mouse-y', touch.clientY + 'px');
                 flashlight.classList.remove('off');
+                warmGlow.classList.remove('off');
 
                 clearTimeout(lightTimeout);
                 lightTimeout = setTimeout(() => {
                     flashlight.classList.add('off');
+                    warmGlow.classList.add('off');
                 }, 2500);
             });
 
@@ -553,10 +580,12 @@
                 document.documentElement.style.setProperty('--mouse-x', touch.clientX + 'px');
                 document.documentElement.style.setProperty('--mouse-y', touch.clientY + 'px');
                 flashlight.classList.remove('off');
+                warmGlow.classList.remove('off');
 
                 clearTimeout(lightTimeout);
                 lightTimeout = setTimeout(() => {
                     flashlight.classList.add('off');
+                    warmGlow.classList.add('off');
                 }, 2500);
             });
         }

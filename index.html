@@ -107,10 +107,9 @@
             opacity: 1;
         }
 
-        @media (max-width: 768px) {
-            .cursor-dot {
-                display: none;
-            }
+        /* Mobile: show dot on tap */
+        .cursor-dot.mobile-visible {
+            opacity: 1;
         }
 
         .container {
@@ -186,12 +185,12 @@
 
             .hero-photo {
                 position: absolute;
-                top: 50%;
+                top: 30%;
                 left: 50%;
                 transform: translate(-50%, -50%);
                 width: 80%;
                 max-width: 300px;
-                opacity: 0.15;
+                opacity: 0.25;
                 z-index: 0;
             }
 
@@ -604,13 +603,17 @@ leonid.one © с вами с 1989 года
                 const touch = e.touches[0];
                 document.documentElement.style.setProperty('--mouse-x', touch.clientX + 'px');
                 document.documentElement.style.setProperty('--mouse-y', touch.clientY + 'px');
+                cursor.style.left = touch.clientX - 6 + 'px';
+                cursor.style.top = touch.clientY - 6 + 'px';
                 flashlight.classList.remove('off');
                 warmGlow.classList.remove('off');
+                cursor.classList.add('mobile-visible');
 
                 clearTimeout(lightTimeout);
                 lightTimeout = setTimeout(() => {
                     flashlight.classList.add('off');
                     warmGlow.classList.add('off');
+                    cursor.classList.remove('mobile-visible');
                 }, 2500);
             });
 
@@ -618,13 +621,17 @@ leonid.one © с вами с 1989 года
                 const touch = e.touches[0];
                 document.documentElement.style.setProperty('--mouse-x', touch.clientX + 'px');
                 document.documentElement.style.setProperty('--mouse-y', touch.clientY + 'px');
+                cursor.style.left = touch.clientX - 6 + 'px';
+                cursor.style.top = touch.clientY - 6 + 'px';
                 flashlight.classList.remove('off');
                 warmGlow.classList.remove('off');
+                cursor.classList.add('mobile-visible');
 
                 clearTimeout(lightTimeout);
                 lightTimeout = setTimeout(() => {
                     flashlight.classList.add('off');
                     warmGlow.classList.add('off');
+                    cursor.classList.remove('mobile-visible');
                 }, 2500);
             });
         }

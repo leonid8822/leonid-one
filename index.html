@@ -107,6 +107,25 @@
             opacity: 1;
         }
 
+        /* Cursor trail */
+        .cursor-trail {
+            position: fixed;
+            pointer-events: none;
+            z-index: 9998;
+        }
+
+        .cursor-trail line {
+            stroke: var(--accent);
+            stroke-width: 1;
+            stroke-linecap: round;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        body:hover .cursor-trail line {
+            opacity: 0.6;
+        }
+
         /* Mobile: show dot on tap */
         .cursor-dot.mobile-visible {
             opacity: 1;
@@ -489,6 +508,9 @@
 <body>
     <div class="flashlight"></div>
     <div class="warm-glow"></div>
+    <svg class="cursor-trail" width="100%" height="100%">
+        <line x1="0" y1="0" x2="0" y2="0" />
+    </svg>
     <div class="cursor-dot"></div>
 
     <main class="container">
@@ -627,8 +649,13 @@ leonid.one © с вами с 1989 года
         const flashlight = document.querySelector('.flashlight');
         const warmGlow = document.querySelector('.warm-glow');
         const cursor = document.querySelector('.cursor-dot');
+        const trailLine = document.querySelector('.cursor-trail line');
         let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
         let cursorX = mouseX, cursorY = mouseY;
+
+        // Trail history for smooth line
+        const trailHistory = [];
+        const trailLength = 20;
 
         // Check if touch device (more reliable than width)
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
@@ -641,12 +668,28 @@ leonid.one © с вами с 1989 года
             document.documentElement.style.setProperty('--mouse-y', mouseY + 'px');
         });
 
-        // Cursor animation (always runs on non-touch devices)
+        // Cursor animation with trail
         function animateCursor() {
             cursorX += (mouseX - cursorX) * 0.15;
             cursorY += (mouseY - cursorY) * 0.15;
             cursor.style.left = cursorX - 6 + 'px';
             cursor.style.top = cursorY - 6 + 'px';
+
+            // Update trail
+            trailHistory.push({ x: cursorX, y: cursorY });
+            if (trailHistory.length > trailLength) {
+                trailHistory.shift();
+            }
+
+            // Draw line from oldest point to cursor
+            if (trailHistory.length > 1) {
+                const oldest = trailHistory[0];
+                trailLine.setAttribute('x1', oldest.x);
+                trailLine.setAttribute('y1', oldest.y);
+                trailLine.setAttribute('x2', cursorX);
+                trailLine.setAttribute('y2', cursorY);
+            }
+
             requestAnimationFrame(animateCursor);
         }
 
@@ -670,7 +713,7 @@ leonid.one © с вами с 1989 года
                 cursor.style.top = newCenterY - 6 + 'px';
             });
         } else {
-            // Desktop: animate cursor
+            // Desktop: animate cursor with trail
             animateCursor();
         }
 

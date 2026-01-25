@@ -190,7 +190,7 @@
                 transform: translate(-50%, -50%);
                 width: 80%;
                 max-width: 300px;
-                opacity: 0.25;
+                opacity: 0.35;
                 z-index: 0;
             }
 
@@ -594,45 +594,25 @@ leonid.one © с вами с 1989 года
             document.documentElement.style.setProperty('--mouse-y', mouseY + 'px');
         });
 
-        // Mobile: tap to light
+        // Mobile: fixed glowing dot in center
         if (isMobile) {
-            flashlight.classList.add('off');
-            warmGlow.classList.add('off');
+            const centerX = window.innerWidth / 2;
+            const centerY = window.innerHeight / 2;
 
-            document.addEventListener('touchstart', (e) => {
-                const touch = e.touches[0];
-                document.documentElement.style.setProperty('--mouse-x', touch.clientX + 'px');
-                document.documentElement.style.setProperty('--mouse-y', touch.clientY + 'px');
-                cursor.style.left = touch.clientX - 6 + 'px';
-                cursor.style.top = touch.clientY - 6 + 'px';
-                flashlight.classList.remove('off');
-                warmGlow.classList.remove('off');
-                cursor.classList.add('mobile-visible');
+            document.documentElement.style.setProperty('--mouse-x', centerX + 'px');
+            document.documentElement.style.setProperty('--mouse-y', centerY + 'px');
+            cursor.style.left = centerX - 6 + 'px';
+            cursor.style.top = centerY - 6 + 'px';
+            cursor.classList.add('mobile-visible');
 
-                clearTimeout(lightTimeout);
-                lightTimeout = setTimeout(() => {
-                    flashlight.classList.add('off');
-                    warmGlow.classList.add('off');
-                    cursor.classList.remove('mobile-visible');
-                }, 2500);
-            });
-
-            document.addEventListener('touchmove', (e) => {
-                const touch = e.touches[0];
-                document.documentElement.style.setProperty('--mouse-x', touch.clientX + 'px');
-                document.documentElement.style.setProperty('--mouse-y', touch.clientY + 'px');
-                cursor.style.left = touch.clientX - 6 + 'px';
-                cursor.style.top = touch.clientY - 6 + 'px';
-                flashlight.classList.remove('off');
-                warmGlow.classList.remove('off');
-                cursor.classList.add('mobile-visible');
-
-                clearTimeout(lightTimeout);
-                lightTimeout = setTimeout(() => {
-                    flashlight.classList.add('off');
-                    warmGlow.classList.add('off');
-                    cursor.classList.remove('mobile-visible');
-                }, 2500);
+            // Update on resize/orientation change
+            window.addEventListener('resize', () => {
+                const newCenterX = window.innerWidth / 2;
+                const newCenterY = window.innerHeight / 2;
+                document.documentElement.style.setProperty('--mouse-x', newCenterX + 'px');
+                document.documentElement.style.setProperty('--mouse-y', newCenterY + 'px');
+                cursor.style.left = newCenterX - 6 + 'px';
+                cursor.style.top = newCenterY - 6 + 'px';
             });
         }
 

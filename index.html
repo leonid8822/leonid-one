@@ -109,13 +109,13 @@
 
         /* Cursor trail */
         .cursor-trail {
-            position: fixed;
+            position: absolute;
             top: 0;
             left: 0;
             width: 100%;
-            height: 100%;
             pointer-events: none;
             z-index: 9998;
+            overflow: visible;
         }
 
         .cursor-trail polyline {
@@ -668,12 +668,17 @@ leonid.one © с вами с 1989 года
         // Check if touch device
         const isTouchDevice = 'ontouchstart' in window || navigator.maxTouchPoints > 0;
 
-        // Update trail polyline from history
+        // Update trail polyline from history (absolute page coords)
         function updateTrail() {
             if (trailHistory.length > 1) {
                 const points = trailHistory.map(p => `${p.x},${p.y}`).join(' ');
                 trailPolyline.setAttribute('points', points);
             }
+        }
+
+        // Make sure SVG height covers the full page
+        function updateSvgHeight() {
+            trailSvg.style.height = document.documentElement.scrollHeight + 'px';
         }
 
         // Desktop: follow cursor
@@ -684,15 +689,18 @@ leonid.one © с вами с 1989 года
             document.documentElement.style.setProperty('--mouse-y', mouseY + 'px');
         });
 
-        // Cursor animation with trail
+        // Cursor animation with trail (using absolute page coords)
         function animateCursor() {
             cursorX += (mouseX - cursorX) * 0.15;
             cursorY += (mouseY - cursorY) * 0.15;
             cursor.style.left = cursorX - 6 + 'px';
             cursor.style.top = cursorY - 6 + 'px';
 
-            // Update trail history
-            trailHistory.push({ x: cursorX, y: cursorY });
+            // Store absolute page coordinates (viewport + scroll)
+            const pageX = cursorX;
+            const pageY = cursorY + window.scrollY;
+
+            trailHistory.push({ x: pageX, y: pageY });
             if (trailHistory.length > trailLength) {
                 trailHistory.shift();
             }
@@ -700,6 +708,12 @@ leonid.one © с вами с 1989 года
             updateTrail();
             requestAnimationFrame(animateCursor);
         }
+
+        // Update trail on scroll (shift existing points)
+        let lastScrollY = window.scrollY;
+        document.addEventListener('scroll', () => {
+            updateSvgHeight();
+        });
 
         if (isTouchDevice) {
             // Mobile: touch to move light and trail
@@ -714,9 +728,10 @@ leonid.one © с вами с 1989 года
             cursor.classList.add('mobile-visible');
             trailSvg.classList.add('mobile-visible');
 
-            // Initialize trail at center
+            // Initialize trail at center (absolute coords)
+            const initialY = centerY + window.scrollY;
             for (let i = 0; i < trailLength; i++) {
-                trailHistory.push({ x: centerX, y: centerY });
+                trailHistory.push({ x: centerX, y: initialY });
             }
 
             function animateMobile() {
@@ -728,7 +743,11 @@ leonid.one © с вами с 1989 года
                 document.documentElement.style.setProperty('--mouse-x', cursorX + 'px');
                 document.documentElement.style.setProperty('--mouse-y', cursorY + 'px');
 
-                trailHistory.push({ x: cursorX, y: cursorY });
+                // Store absolute page coordinates
+                const pageX = cursorX;
+                const pageY = cursorY + window.scrollY;
+
+                trailHistory.push({ x: pageX, y: pageY });
                 if (trailHistory.length > trailLength) {
                     trailHistory.shift();
                 }
@@ -749,9 +768,11 @@ leonid.one © с вами с 1989 года
                 touchY = touch.clientY;
             });
 
+            updateSvgHeight();
             animateMobile();
         } else {
             // Desktop: animate cursor with trail
+            updateSvgHeight();
             animateCursor();
         }
 

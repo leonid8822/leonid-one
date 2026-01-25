@@ -56,7 +56,7 @@
             pointer-events: none;
             z-index: 9998;
             background: radial-gradient(
-                circle 200px at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
+                circle 400px at var(--mouse-x, -1000px) var(--mouse-y, -1000px),
                 transparent 0%,
                 rgba(0, 0, 0, 0.85) 100%
             );
@@ -366,6 +366,10 @@
             color: var(--text-muted);
         }
 
+        .footer-accent {
+            color: var(--accent);
+        }
+
         /* Responsive */
         @media (max-width: 640px) {
             .path-item {
@@ -507,7 +511,7 @@
 
     <footer>
         <div class="container">
-            leonid.one · 2026
+            <span class="footer-accent">с 1989</span>
         </div>
     </footer>
 
